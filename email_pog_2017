@@ -1,0 +1,94 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import smtplib
+from datetime import datetime
+import pandas as pd
+import numpy as np
+import sys
+import random
+import time
+
+print('Python version ' + sys.version)
+print('Numpy version ' + np.__version__)
+print('Pandas version ' + pd.__version__)
+
+
+time_format = "[%Y.%m.%d-%H:%M:%S.%f]"
+
+def times():
+    return str(datetime.strftime(datetime.now(), time_format))
+
+def send_gim_mail(name='',finame='',university='',unels='',toaddrs=''):
+    fromaddr = 'university@peopleofgymnasium.ru'
+    if university == "Другое":
+        university = unels
+    university = university.strip()
+    finame = finame.strip()
+    name = name.strip()
+    toaddrs = toaddrs.strip()
+    #vk.com/page-119669285_52230616
+    if toaddrs != '-':
+        print('{}: [/] Begin send to "{}"..'.format(times(), toaddrs))
+        text = '''Доброго времени суток, {} {}! 
+
+Ассоциация выпускников гимназии People of Gymnasium обновляет Институт представителей (ссылка ниже) - платформу, которая помогает гимназистам в выборе Вуза, поступлении и дальнейшем обучении. 
+
+Мы приглашаем Вас стать представителем своего ВУЗа, {}! 
+
+Вы предоставите гимназистам уникальную возможность понять, что из себя представляет ВУЗ и направление, на котором Вы учитесь, получить информацию о самых важных моментах поступления и просто почувствовать поддержку от выпускников Гимназии в этот нелегкий момент их жизненного пути. 
+Представьте насколько упростился бы процесс поступления в ВУЗ вышей мечты, если бы вы знали то, что знаете сейчас! 
+Если вы хотите помочь проекту и готовы сотрудничать, а также просто поделиться своим мнением по поводу поступления, просто ответьте на гугл форму (ссылка ниже), и добро пожаловать в команду. 
+Также внизу Вы можете ознакомиться со статистикой по базе выпускников гимназии, в создании которой Вы принимали участие. 
+
+Заранее спасибо! 
+
+Институт представителей :
+https://vk.com/page-119669285_52230616
+Ссылка на гугл форму: 
+<ссылка удаена для githab>
+Ссылка на аналитику базы:
+https://app.powerbi.com/view?r=eyJrIjoiMDBkYzA4ZGMtNTU3OS00NDhmLWI3MWItMjVjYzI4ZWM1NmE5IiwidCI6ImI3ZjgxMzlhLWEwYTUtNGU0Ny05MGExLTI1OGNjZjE5MTYxNSIsImMiOjl9
+
+С уважением, команда People of Gymnasium '''.format(finame,name, university)
+        subject = "Институт Представителей"
+
+        msg = "\r\n".join([
+          "From: People of Gymnasium | University <{}>".format(fromaddr),
+          "To: {}".format(toaddrs),
+          "Subject: {}".format(subject),
+          "",
+          text
+          ])
+        print(msg)
+        msg = (msg).encode('utf-8')
+        server.sendmail(fromaddr, toaddrs, msg)
+        st = random.randrange(0,5)
+        print('{}: [/] End   send to "{}"..\nsleep {}s'.format(times(), toaddrs,10+st))
+        time.sleep(5+st)
+    return 0
+
+
+
+file = 'am_pog.csv'
+print('{}: [/] Begin read file {}..'.format(times(),file))
+df = pd.read_csv(file)
+print('{}: [/] End read file {}..'.format(times(),file))
+
+print(df[['Имя','Фамилия','Вы учитесь/учились','Если вы учитесь/учились  в ВУЗе не указанном в списке','Ваш адрес электронной почты',]])
+
+username = user
+password = pas
+#print('{}: [/] connetting smtp.gmail.com:587'.format(times()))
+#server = smtplib.SMTP('smtp.gmail.com:587')
+print('{}: [/] connetting smtp.yandex.ru:465'.format(times()))
+server = smtplib.SMTP_SSL('smtp.yandex.ru:465')
+print(server.ehlo())
+#print(server.starttls())
+print('{}: [/] Begin login in email..'.format(times()))
+server.login(username, password)
+for a,b,c,d,e in zip(df['Имя'],df['Фамилия'],df['Вы учитесь/учились'],df['Если вы учитесь/учились  в ВУЗе не указанном в списке'],df['Ваш адрес электронной почты']):
+    send_gim_mail(a,b,c,d,e)
+
+print('{}: [/] End all.'.format(times()))
+server.quit()
